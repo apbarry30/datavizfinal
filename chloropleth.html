@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Exercise Portfolio</title>
+    <style>
+  .map {
+    width: 100%;
+    max-width: 1024px;
+    margin: 0 auto;
+  }
+</style>
+    <link href="css/style.css" rel="stylesheet" />
+  </head>
+
+  <body>
+
+    <header>
+      <!-- ADD YOUR NAME -->
+      <h1>Amanda Barry: Exercise Portfolio</h1>
+    </header>
+
+    <div id="content">
+
+      <nav>
+        <ul>
+          <li><a href="index.html">Return to Main Page</a></li>
+        </ul>
+      </nav>
+
+      <main>
+
+        <h2>Chloropleth Map</h2>
+
+        <p>Education Attainment of High School or Higher in the US</p>
+
+        <!-- ADD YOUR VISUALIZATION HERE -->
+
+      </main>
+    </div>
+
+<div class="map"></div>
+  <script src="js/d3.min.js"></script>
+    <script>
+
+    var width = 600;
+    var height = 500;
+
+    var margin = {
+      top: 50,
+      bottom: 30,
+      left: 60,
+      right: 30,
+    };
+
+
+
+    d3.json("data/geojson/us-states.json").then(function(us){
+    d3.csv("data/edu.csv").then(function(data){
+      console.log(data);
+
+
+        var projection = d3.geoAlbersUsa()
+        .translate([width/2, height/2])
+        .scale([600]);
+
+        var path= d3.geoPath()
+        .projection(projection);
+
+
+        var svg = d3.select(".map")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .append("g")
+            .attr("tranform", "translate(0" + margin.left + "," + margin.top + ")");
+
+// var color_array = d3.scaleOrdinal(d3.schemeBlues[9]);
+
+        var us_features = us.features;
+            data.forEach(function(d){
+               var t_state = d.State;
+               var t_value = +d.Education;
+               us_features.forEach(function(u){
+                 var us_state = u.properties.name;
+                 if (us_state == t_state){
+                   u.properties.value = t_value;
+                 }
+               })
+             });
+
+             var color_array = d3.schemeSet2;
+             var color = d3.scaleLinear()
+                       .domain(d3.extent(data,function(d){
+                         return +d.Education;
+                       }))
+                       .range(d3.schemeSet2);
+
+            var map = svg.append("g")
+            .attr("id", "map")
+            map.selectAll("path")
+            .data(us.features)
+            .enter()
+            .append("path")
+            .attr("d", path)
+            .attr("stroke", "white")
+            .attr("stroke-width", "2px")
+
+            .attr("fill",function(d){
+              var value = d.properties.value;
+              console.log(value,color(value));
+                if (value) {
+                  return color(value);
+                } else {
+                  return "#ccc";
+                }
+              })
+
+              var legend = svg.append("g");
+                 legend.selectAll("rect")
+                       .data(color_array)
+                       .enter()
+                       .append("rect")
+                       .attr("x",function(d,i){
+                         return i*60+width/12;
+                       })
+                       .attr("y",20)
+                       .attr("width",50)
+                       .attr("height",40)
+                       .attr("fill",function(d){
+                         return d;
+                       })
+                 var max_val = d3.max(data,function(d){
+                   return +d.Education;
+                  })
+                 var min_val = d3.min(data,function(d){
+                   return +d.Education;
+                  })
+
+                 var interval = (max_val-min_val)/8;
+                 legend.selectAll("text")
+                       .data(color_array)
+                       .enter()
+                       .append("text")
+                       .attr("class","leg_text")
+                       .attr("x",function(d,i){
+                         return i*60+width/12;
+                       })
+                       .attr("dx","0.2em")
+                       .attr("y",35)
+
+                       .text(function(d,i){
+                         var current_value = min_val+(i*interval);
+                         return current_value.toFixed(1) + "%";
+                       })
+
+  })
+});
+      // add your script here
+      // OR
+      // add a link to a stand-alone script in the js folder
+
+    </script>
+  </body>
+</html>

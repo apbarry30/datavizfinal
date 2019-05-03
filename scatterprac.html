@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Exercise Portfolio</title>
+    <link href="css/style.css" rel="stylesheet" />
+  </head>
+
+  <body>
+
+    <header>
+      <!-- ADD YOUR NAME -->
+      <h1>YOUR NAME: Exercise Portfolio</h1>
+    </header>
+
+    <div id="content">
+
+      <nav>
+        <ul>
+          <li><a href="index.html">Return to Main Page</a></li>
+        </ul>
+      </nav>
+      <div class="tooltip">
+      <main>
+
+        <h2><!-- VISUALIZATION TITLE --></h2>
+
+        <p><!-- INFORMATION ABOUT YOUR VISUALIZATION: What is this about? --></p>
+
+        <!-- ADD YOUR VISUALIZATION HERE -->
+
+      </main>
+    </div>
+
+    <script src="js/d3.min.js"></script>
+    <script>
+    var margin= {
+    top:20,
+    right:10,
+    bottom:10,
+    left:20
+  };
+    var width= 500-margin.left-margin.right;
+    var height= 500-margin.top-margin.bottom;
+    var padding=20;
+    var svgthree = d3.select("body")
+                .append("svg")
+                .attr("width", width+margin.right+margin.left+20)
+                .attr("height", height+margin.bottom+margin.top)
+                .append("g")
+                .attr("id","svgthree");
+    //labels
+
+    d3.csv("data/majorcities.csv").then(function(data){
+        console.log(data);
+    //
+    // var svgthree = d3.select("body")
+    //             .append("svgthree")
+    //             .attr("width", width)
+    //             .attr("height", height);
+
+            var xScale= d3.scaleLinear()
+            .domain([d3.min(data, function(d) {
+              return +d.pop;
+            }), d3.max(data, function(d) {
+              return +d.pop;
+            })])
+            .range([padding,width-padding]);
+
+            var yScale= d3.scaleLinear()
+            .domain([d3.min(data, function(d) {
+              return +d.landArea;
+            }), d3.max(data, function(d) {
+              return +d.landArea;
+            })])
+              .range([width-padding,padding]);
+
+            var rScale= d3.scaleLinear()
+              .domain([d3.min(data, function(d) {
+                return +d.density;
+              }), d3.max(data, function(d) {
+                return +d.density;
+              })])
+            .range([3, 15]);
+
+    var circles= svgthree.selectAll("circle")
+    .data(data)
+    .enter()
+    .append("circle")
+
+    .attr("cx", function(d,i){
+      return xScale(+d.pop);
+    })
+    .attr("cy", function(d){
+      return yScale(+d.landArea);
+
+    })
+    .attr("r", function(d){
+      return rScale(+d.density);
+    })
+
+    .attr("fill", "lightblue")
+    .attr("class", "circles")
+    .attr("transform", "translate("+(margin.left+padding+10)+",0)");
+    d3.selectAll(".circles")
+    .data(data)
+    .on("mouseover", function(d) {
+    //   d3.select(this).attr("fill", "black");
+       d3.select(".tooltip").classed("hidden",false)
+
+    })
+    .on("mousemove", function(d) {
+      var state= d.state
+      var currentX = d3.event.pageX + 10;
+      var currentY = d3.event.pageY + 10;
+      d3.select(".tooltip")
+        .style("left",currentX + "px")
+        .style("top",currentY + "px")
+        .html("<p>State: " + state + "<br/>" + "density: " + +d.density + "</p>");
+    })
+    .on("mouseout", function(d) {
+    //   d3.select(this).attr("fill", "red");
+       d3.select(".tooltip").classed("hidden",true);
+    });
+
+
+
+    var xAxis= d3.axisBottom(xScale)
+
+            svgthree.append("g")
+            .attr("class", "xaxis")
+            .attr("transform", "translate("+(padding+10)+"," + (450) + ")")
+            .call(xAxis)
+            ;
+
+            var yAxis = d3.axisLeft(yScale)
+
+                       svgthree.append("g")
+                       .attr("class", "y-axis")
+                       .attr("transform", "translate("+(margin.left+padding+10)+",0)")
+                       .call(yAxis);
+
+                       svgthree.append("text")
+                             .text("Population vs Land Area")
+                             .attr("transform", "translate("+width/2+", 15)");
+                          svgthree.append("text")
+                              .text("Population in Millions")
+                             .attr("transform", "translate(10,800)");
+                          svgthree.append("text")
+                             .text("Land Area (in thousands)")
+                             .attr("text-anchor", "middle")
+                              .attr("transform", "translate(15,250)rotate(-90)")
+                              .attr("font-size","14px");
+    //
+
+
+
+
+
+    })//major cities
+      // add your script here
+      // OR
+      // add a link to a stand-alone script in the js folder
+
+    </script>
+  </body>
+</html>

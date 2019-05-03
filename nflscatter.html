@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Exercise Portfolio</title>
+    <link href="css/style.css" rel="stylesheet" />
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  </head>
+
+  <body>
+
+    <header>
+      <!-- ADD YOUR NAME -->
+      <h1>Amanda Barry: Exercise Portfolio</h1>
+    </header>
+
+    <div id="content">
+
+      <nav>
+        <ul>
+          <li><a href="index.html">Return to Main Page</a></li>
+        </ul>
+      </nav>
+
+      <main>
+
+        <h2>NFL Rushing Statisitcs 2018</h2>
+
+        <p><!-- INFORMATION ABOUT YOUR VISUALIZATION: What is this about? --></p>
+
+        <!-- ADD YOUR VISUALIZATION HERE -->
+
+      </main>
+    </div>
+
+
+    <script>
+    var width= 800;
+    var height= 900;
+    var padding=50;
+
+    var margin = {
+      top: 50,
+      bottom: 30,
+      left: 60,
+      right: 30,
+    };
+    //Show the relationship between yards (`Yds`) and touchdowns (`TD`). Use fumbles (`fum`) to represent the size of each point.
+   d3.csv("data/majorcities.csv").then(function(data){
+        console.log(data);
+var state=+d.state;
+    var svg = d3.select("body")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height);
+
+            var xScale= d3.scaleLinear()
+            .domain([d3.min(data, function(d) {
+              return +d.pop;
+            }), d3.max(data, function(d) {
+              return +d.pop;
+            })])
+            .range([padding,width-padding]);
+
+            var yScale= d3.scaleLinear()
+            .domain([d3.min(data, function(d) {
+              return +d.landArea;
+            }), d3.max(data, function(d) {
+              return +d.landArea;
+            })])
+              .range([width-padding,padding]);
+
+            var rScale= d3.scaleLinear()
+              .domain([d3.min(data, function(d) {
+                return +d.density;
+              }), d3.max(data, function(d) {
+                return +d.density;
+              })])
+            .range([3, 15]);
+
+  var circles= svg.selectAll("circle")
+    .data(data)
+    .enter()
+    .append("circle");
+
+    circles.attr("cx", function(d,i){
+      return xScale(+d.pop);
+    })
+    .attr("cy", function(d){
+      return yScale(+d.landArea);
+
+    })
+    .attr("r", function(d){
+      return rScale(+d.density);
+    })
+    // .attr("fill", function(d) {
+    //   if(+d.FUM > 0){return "lightblue"}
+    //   else {return "purple"}
+    // })
+    // .style("fill-opacity", function(d) {
+    //   if (+d.Att >= 150){return 1}
+    //   else{return 0}
+    .attr("fill", "lightblue");
+
+
+//var labels= svg.selectAll("text")
+//            .data(data)
+//            .enter()
+//            .append("text")
+//            .text(function(d){
+//              return d.Yds + "," + d.fum;
+//            })
+
+var xAxis= d3.axisBottom(xScale)
+
+            svg.append("g")
+            .attr("class", "xaxis")
+            .attr("transform", "translate(0," + (750) + ")")
+            .call(xAxis);
+
+            var yAxis = d3.axisLeft(yScale)
+
+                       svg.append("g")
+                       .attr("class", "y-axis")
+                       .attr("transform", "translate(" +(padding+1)+ ",0)")
+                       .call(yAxis);
+
+                       svg.append("text")
+                   					 .text("NFL Rushing Yards vs. Touchdowns")
+                   					 .attr("transform", "translate("+width/2+", 15)");
+                   			  svg.append("text")
+                              .text("Yards")
+                   					 .attr("transform", "translate(500,800)");
+                   				svg.append("text")
+                   				   .text("Touchdowns")
+                   					 .attr("text-anchor", "middle")
+                              .attr("transform", "translate(20,500)rotate(-90)")
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      // add your script here
+      // OR
+      // add a link to a stand-alone script in the js folder
+
+    </script>
+  </body>
+</html>

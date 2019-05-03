@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Exercise Portfolio</title>
+    <link href="css/style.css" rel="stylesheet" />
+  </head>
+
+  <body>
+
+    <header>
+      <!-- ADD YOUR NAME -->
+      <h1>YOUR NAME: Exercise Portfolio</h1>
+    </header>
+
+    <div id="content">
+
+      <nav>
+        <ul>
+          <li><a href="index.html">Return to Main Page</a></li>
+        </ul>
+      </nav>
+
+      <main>
+
+        <h2><!-- VISUALIZATION TITLE --></h2>
+
+        <p><!-- INFORMATION ABOUT YOUR VISUALIZATION: What is this about? --></p>
+
+        <!-- ADD YOUR VISUALIZATION HERE -->
+        <div class="tooltip"/>
+      </main>
+    </div>
+
+    <script src="js/d3.min.js"></script>
+    <script>
+    var margin= {
+    top:20,
+    right:10,
+    bottom:10,
+    left:20
+  };
+    var width= 500-margin.left-margin.right;
+    var height= 500-margin.top-margin.bottom;
+    var padding=20;
+    d3.json("data/geojson/us-states.json").then(function(usMap){
+        d3.csv("data/meansbystate.csv").then(function(data){
+          console.log(data);
+
+          var svgtwo = d3.select("body").append("svg");
+          svgtwo.attr("width", width+padding)
+          .attr("height", height+padding)
+          .attr("id", "two")
+          .append("g");
+
+          svgtwo.append("div");
+
+          var usaFeatures = usMap.features;
+
+          data.forEach(function(d) {
+            var stateName = d.State;
+            var population = +d.public;
+
+            usaFeatures.forEach(function(u) {
+              var usaState = u.properties.name;
+              if (usaState == stateName) {
+                u.properties.public = population;
+              }
+            });
+          });
+
+          // Has population data merged?
+          console.log(usaFeatures);
+
+
+
+          var projection = d3.geoAlbersUsa()
+          .translate([width/2, height/2])
+          .scale([650]);
+
+          var path = d3.geoPath().projection(projection);
+    var color_array=(["#e5f4e0", "#cae4c0", "#aacf9d",
+            "#87b476", "#6c9e5a", "#548741",
+            "#40722d", "#2e5c1d", "#1e4410",
+            "#102a07", "#071602"]);
+          var colors = d3.scaleQuantize()
+                         .domain(d3.extent(usaFeatures, function(d) { return d.properties.public; }))
+                         .range(["#e5f4e0", "#cae4c0", "#aacf9d",
+                                 "#87b476", "#6c9e5a", "#548741",
+                                 "#40722d", "#2e5c1d", "#1e4410",
+                                 "#102a07", "#071602"]);
+
+
+
+         var map =
+         svgtwo.selectAll("path")
+          .data(usMap.features)
+          .enter()
+          .append("path")
+    // var map= svgtwo.selectAll("path")
+    //          .data(usaFeatures)
+    //          .enter()
+    //          .append("path")
+             .attr("d", path)
+             .attr("id", "map")
+             .attr("fill", function(d) {
+               if(d.properties.public) {
+                 return colors(d.properties.public);
+               } else {
+                 return "#ccc";
+               }
+             })
+             .attr("stroke", "#fff")
+             .attr("stroke-width", "2px");
+
+
+            d3.selectAll("#map")
+             .data(data)
+             .on("mouseover", function(d) {
+            //   d3.select(this).attr("fill", "black");
+                d3.select(".tooltip").classed("hidden",false)
+
+             })
+             .on("mousemove", function(d) {
+               var currentX = d3.event.pageX + 10;
+               var currentY = d3.event.pageY + 10;
+               d3.select(".tooltip")
+                 .style("left",currentX + "px")
+                 .style("top",currentY + "px")
+                 .html("<p>Amount of People<br/> Public Trans: " + +d.PublicT + "<br/>" + "Drive: " + +d.Drive + "<br/>" +
+                       "Walk: " + +d.Walk + "</p>");
+             })
+             .on("mouseout", function(d) {
+            //   d3.select(this).attr("fill", "red");
+                d3.select(".tooltip").classed("hidden",true);
+             });
+
+
+
+
+
+    //label
+          svgtwo.append("text")
+                .text("Means of Travel to Work by Public Transportation")
+                .attr("transform", "translate(55, 15)");
+          //
+
+          //
+          var legend = svgtwo.append("g");
+          legend.selectAll("rect")
+                .data(color_array)
+                .enter()
+                .append("rect")
+                .attr("x",function(d,i){
+                  return i*30+width/3;
+                })
+                .attr("y",20)
+                .attr("width",70)
+                .attr("height",45)
+                .attr("fill",function(d){
+                  return d;
+                })
+          var max_val = d3.max(data,function(d){
+            return +d.public;
+           })
+          var min_val = d3.min(data,function(d){
+            return +d.public;
+           })
+          var interval = (max_val-min_val)/11;
+          legend.selectAll("text")
+                .data(color_array)
+                .enter()
+                .append("text")
+                .attr("class","leg_text")
+                .attr("x",function(d,i){
+                  return i*30+width/3;
+                })
+                .attr("y",45)
+                .attr("dx","0.2em")
+                .attr("font-size","10px")
+
+                .text(function(d,i){
+                  var current_value = min_val+(i*interval);
+                  return current_value.toFixed(1) + "%";
+                })
+
+
+                       })//cloropleth
+                         })//json
+
+
+      // add your script here
+      // OR
+      // add a link to a stand-alone script in the js folder
+
+    </script>
+  </body>
+</html>

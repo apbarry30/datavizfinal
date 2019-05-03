@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>can you keep up with nyc</title>
+    <link href="css/style.css" rel="stylesheet" />
+  </head>
+
+  <body>
+
+    <header>
+      <!-- ADD YOUR NAME -->
+      <h1>Can you Keep up with working in NY?</h1>
+
+    </header>
+
+    <div id="content">
+
+      <nav>
+        <ul>
+          <li><a href="index.html">Travel Time to Work</a></li>
+            <li><a href="#two">Ways to Travel</a></li>
+            <li><a href="#svgthree">Population Density</a></li>
+        </ul>
+      </nav>
+
+      <main>
+
+        <h2>Moving around NY</h2>
+
+        <p id=intro>I will explore further into transportation in New York</p>
+
+
+        <div class="tooltip"/>
+      </main>
+    </div>
+
+    <script src= "js/lodash.js"></script>
+    <script src="js/d3.min.js"></script>
+    <script>
+    var margin= {
+    top:20,
+    right:10,
+    bottom:10,
+    left:20
+  };
+    var width= 500-margin.left-margin.right;
+    var height= 500-margin.top-margin.bottom;
+    var padding=20;
+
+    d3.csv("data/timetotravel.csv").then(function(data){
+      console.log(data);
+
+      var svg = d3.select("body").append("svg");
+      svg.attr("width", width+20)
+      .attr("height", height+70)
+      .attr("id", "one");
+// scale
+var xScale = d3.scaleLinear()
+ .domain([0,d3.max(data,function(d){
+   return +d.means;
+ })])
+.range([0, width-margin.left]);
+
+var yScale = d3.scaleLinear()
+           .domain([0, d3.max(data, function(d) {
+             return (+d.NY);
+           })])
+          .range([height,0]);
+
+          // d3.select(".buttonny")
+          //   .on("click", function() {
+          //     console.log("Button Clicked");
+          //     svg.selectAll(".buttonny")
+          //     xScale.domain(data.map(function(d) {
+          //       return d.means;
+          //     }))
+    var rectny= svg.selectAll("rect")
+                 .data(data)
+                 .enter()
+                 .append("rect")
+                 .attr("x", function(d,i) {
+                   return padding+(i*25)+15;
+                 })
+                 .attr("y", function(d) {
+                 return [yScale(+d.NY)];
+               })
+               .attr("width", 20)              //
+               .attr("height", function(d) {
+               return height-yScale(+d.NY);
+             })
+               .attr("fill", "lightblue")
+               .attr("class", "rectny")
+               .attr("transform", "translate("+(margin.left+padding)+" , 0)");
+// });
+ var labels = svg.selectAll("text")
+              .data(data)
+              .enter()
+              .append("text")
+              .text(function(d) {
+                return d.means;
+               })
+              .style("font-size", "8px");
+
+              labels.attr("x", function(d, i) {
+                    return padding+(i * 25)+15;
+                    })
+              .attr("y", function(d) {
+                    return height-5;
+                    })
+              .attr("transform", "translate("+(margin.left+padding)+" , 0)");
+
+var nycbutton = svg.append("rect")
+                .attr("x", "350")
+                .attr("y" ,"100")
+                .attr("width", "100")
+                .attr("height", "50")
+                .attr("fill", "pink")
+                .attr("class", "buttonnyc");
+
+                svg.append("text")
+                      .text("New York City")
+                      .attr("transform", "translate(355, 135)")
+                      .attr("font-size", "12px");
+
+var nybutton = svg.append("rect")
+                .attr("x", "350")
+                .attr("y" ,"150")
+                .attr("width", "100")
+                .attr("height", "50")
+                .attr("class", "nybutton")
+                .attr("fill", "lightblue");
+                svg.append("text")
+                      .text("New York State")
+                      .attr("transform", "translate(355, 175)")
+                      .attr("font-size", "12px");
+//labels
+svg.append("text")
+      .text("Travel Time to Work")
+      .attr("transform", "translate(50, 15)");
+      svg.append("text")
+            .text("Minutes")
+            .attr("transform", "translate("+width/2+", "+(height+20)+")");
+
+            svg.append("text")
+               .text("% of the Population")
+               .attr("text-anchor", "middle")
+                .attr("transform", "translate(15,250)rotate(-90)")
+                .attr("font-size","14px");
+
+
+//click
+               d3.select(".buttonnyc")
+                 .on("click", function() {
+                   console.log("Button Clicked");
+                   svg.selectAll(".rectny")
+                   xScale.domain(data.map(function(d) {
+                     return d.means;
+                   }))
+                var nycbars=   svg.selectAll(".rectny")
+                      .data(data)
+                      .transition()
+                      .duration(1500)
+                      .ease(d3.easeElasticOut)
+                      .attr("x", function(d,i) {
+                        return padding+(i*25)+15;
+                      })
+                      .attr("y", function(d) {
+                      return yScale(+d.NYC);
+                      })
+                      .attr("width", 20)              //
+                      .attr ("height", function(d) {
+                      return height-yScale(+d.NYC);
+                      })
+                      .attr("fill", "pink")
+                      .attr("class", "nycbars");
+                 });
+                 //
+                 d3.select(".nybutton")
+                   .on("click", function() {
+                     console.log("Button Clicked");
+                     svg.selectAll(".rectny")
+                     xScale.domain(data.map(function(d) {
+                       return d.means;
+                     }))
+                     var rectny= svg.selectAll(".rectny")
+                                  .data(data)
+                                  .enter()
+                                  .append("rect")
+                                  .transition()
+                                  .duration(1500)
+                                  .ease(d3.easeElasticOut)
+                                  .attr("x", function(d,i) {
+                                    return padding+(i*25)+15;
+                                  })
+                                  .attr("y", function(d) {
+                                  return [yScale(+d.NY)];
+                                })
+                                .attr("width", 20)              //
+                                .attr("height", function(d) {
+                                return height-yScale(+d.NY);
+                              })
+                                .attr("fill", "lightblue")
+                                .attr("class", "rectny")
+                                .attr("transform", "translate("+(margin.left+padding)+" , 0)");
+                   });
+
+                 var xAxis = d3.axisBottom()
+                              .scale(xScale)
+                             svg.append("g")
+                          .attr("class", "x-axis")
+                          .attr("transform", "translate("+(margin.left+padding)+","+(height)+")")
+                          .call(xAxis);
+
+                var yAxis = d3.axisLeft()
+                    .scale(yScale)
+                     svg.append("g")
+                        .attr("class", "y-axis")
+                        .attr("transform", "translate("+(margin.left+padding)+" , 0)")
+                        .call(yAxis);
+
+//onto the next for now/////////////////////////////////////////////////////////
+
+d3.json("data/geojson/us-states.json").then(function(usMap){
+    d3.csv("data/meansbystate.csv").then(function(data){
+      console.log(data);
+
+      var svgtwo = d3.select("body").append("svg");
+      svgtwo.attr("width", width+padding)
+      .attr("height", height+padding)
+      .attr("id", "two")
+      .append("g");
+
+      svgtwo.append("div");
+
+      var usaFeatures = usMap.features;
+
+      data.forEach(function(d) {
+        var stateName = d.State;
+        var population = +d.public;
+
+        usaFeatures.forEach(function(u) {
+          var usaState = u.properties.name;
+          if (usaState == stateName) {
+            u.properties.public = population;
+          }
+        });
+      });
+
+      // Has population data merged?
+      console.log(usaFeatures);
+
+
+
+      var projection = d3.geoAlbersUsa()
+      .translate([width/2, height/2])
+      .scale([650]);
+
+      var path = d3.geoPath().projection(projection);
+var color_array=(["#e5f4e0", "#cae4c0", "#aacf9d",
+        "#87b476", "#6c9e5a", "#548741",
+        "#40722d", "#2e5c1d", "#1e4410",
+        "#102a07", "#071602"]);
+      var colors = d3.scaleQuantize()
+                     .domain(d3.extent(usaFeatures, function(d) { return d.properties.public; }))
+                     .range(["#e5f4e0", "#cae4c0", "#aacf9d",
+                             "#87b476", "#6c9e5a", "#548741",
+                             "#40722d", "#2e5c1d", "#1e4410",
+                             "#102a07", "#071602"]);
+
+
+
+     var map =
+     svgtwo.selectAll("path")
+      .data(usMap.features)
+      .enter()
+      .append("path")
+// var map= svgtwo.selectAll("path")
+//          .data(usaFeatures)
+//          .enter()
+//          .append("path")
+         .attr("d", path)
+         .attr("id", "map")
+         .attr("fill", function(d) {
+           if(d.properties.public) {
+             return colors(d.properties.public);
+           } else {
+             return "#ccc";
+           }
+         })
+         .attr("stroke", "#fff")
+         .attr("stroke-width", "2px");
+
+
+        d3.selectAll("#map")
+         .data(data)
+         .on("mouseover", function(d) {
+        //   d3.select(this).attr("fill", "black");
+            d3.select(".tooltip").classed("hidden",false)
+
+         })
+         .on("mousemove", function(d) {
+           var currentX = d3.event.pageX + 10;
+           var currentY = d3.event.pageY + 10;
+           d3.select(".tooltip")
+             .style("left",currentX + "px")
+             .style("top",currentY + "px")
+             .html("<p>Amount of People<br/> Public Trans: " + +d.PublicT + "<br/>" + "Drive: " + +d.Drive + "<br/>" +
+                   "Walk: " + +d.Walk + "</p>");
+         })
+         .on("mouseout", function(d) {
+        //   d3.select(this).attr("fill", "red");
+            d3.select(".tooltip").classed("hidden",true);
+         });
+
+
+
+
+
+//label
+      svgtwo.append("text")
+            .text("Means of Travel to Work by Public Transportation")
+            .attr("transform", "translate(50, 15)");
+      //
+
+      //legend
+      var legend = svgtwo.append("g");
+      legend.selectAll("rect")
+            .data(color_array)
+            .enter()
+            .append("rect")
+            .attr("x",function(d,i){
+              return i*30+width/3;
+            })
+            .attr("y",20)
+            .attr("width",70)
+            .attr("height",45)
+            .attr("fill",function(d){
+              return d;
+            })
+      var max_val = d3.max(data,function(d){
+        return +d.public;
+       })
+      var min_val = d3.min(data,function(d){
+        return +d.public;
+       })
+      var interval = (max_val-min_val)/11;
+      legend.selectAll("text")
+            .data(color_array)
+            .enter()
+            .append("text")
+            .attr("class","leg_text")
+            .attr("x",function(d,i){
+              return i*30+width/3;
+            })
+            .attr("y",45)
+            .attr("dx","0.2em")
+            .attr("font-size","10px")
+
+            .text(function(d,i){
+              var current_value = min_val+(i*interval);
+              return current_value.toFixed(1) + "%";
+            })
+      //
+
+/////lastchart SCATTERPLOT///////////
+// var svgthree = d3.select("body").append("svg");
+// svgthree.attr("width", width+padding)
+// .attr("height", height+padding)
+// .attr("id", "three")
+// .append("g");
+// .attr("tranform", "translate(" + (margin.left) + "," + margin.top + ")");
+
+       var svgthree = d3.select("body")
+                   .append("svg")
+                   .attr("width", width+margin.right+margin.left+20)
+                   .attr("height", height+margin.bottom+margin.top)
+                   .append("g")
+                   .attr("id","svgthree");
+//labels
+
+d3.csv("data/majorcities.csv").then(function(data){
+    console.log(data);
+//
+// var svgthree = d3.select("body")
+//             .append("svgthree")
+//             .attr("width", width)
+//             .attr("height", height);
+
+        var xScale= d3.scaleLinear()
+        .domain([d3.min(data, function(d) {
+          return +d.pop;
+        }), d3.max(data, function(d) {
+          return +d.pop;
+        })])
+        .range([padding,width-padding]);
+
+        var yScale= d3.scaleLinear()
+        .domain([d3.min(data, function(d) {
+          return +d.landArea;
+        }), d3.max(data, function(d) {
+          return +d.landArea;
+        })])
+          .range([width-padding,padding]);
+
+        var rScale= d3.scaleLinear()
+          .domain([d3.min(data, function(d) {
+            return +d.density;
+          }), d3.max(data, function(d) {
+            return +d.density;
+          })])
+        .range([3, 15]);
+
+var circles= svgthree.selectAll("circle")
+.data(data)
+.enter()
+.append("circle")
+
+.attr("cx", function(d,i){
+  return xScale(+d.pop);
+})
+.attr("cy", function(d){
+  return yScale(+d.landArea);
+
+})
+.attr("r", function(d){
+  return rScale(+d.density);
+})
+
+.attr("fill", "lightblue")
+.attr("class", "circles")
+.attr("transform", "translate("+(margin.left+padding+10)+",0)");
+d3.selectAll(".circles")
+.data(data)
+.on("mouseover", function(d) {
+//   d3.select(this).attr("fill", "black");
+   d3.select(".tooltip").classed("hidden",false)
+
+})
+.on("mousemove", function(d) {
+  var state= d.state
+  var currentX = d3.event.pageX + 10;
+  var currentY = d3.event.pageY + 10;
+  d3.select(".tooltip")
+    .style("left",currentX + "px")
+    .style("top",currentY + "px")
+    .html("<p>State: " + state + "<br/>" + "density: " + +d.density + "</p>");
+})
+.on("mouseout", function(d) {
+//   d3.select(this).attr("fill", "red");
+   d3.select(".tooltip").classed("hidden",true);
+});
+
+
+
+var xAxis= d3.axisBottom(xScale)
+
+        svgthree.append("g")
+        .attr("class", "xaxis")
+        .attr("transform", "translate("+(padding+10)+"," + (450) + ")")
+        .call(xAxis)
+        ;
+
+        var yAxis = d3.axisLeft(yScale)
+
+                   svgthree.append("g")
+                   .attr("class", "y-axis")
+                   .attr("transform", "translate("+(margin.left+padding+10)+",0)")
+                   .call(yAxis);
+
+                   svgthree.append("text")
+                         .text("Population vs Land Area of Key States")
+                         .attr("transform", "translate("+width/2+", 15)");
+                      svgthree.append("text")
+                          .text("Population in Millions")
+                         .attr("transform", "translate(10,800)");
+                      svgthree.append("text")
+                         .text("Land Area (in thousands)")
+                         .attr("text-anchor", "middle")
+                          .attr("transform", "translate(15,250)rotate(-90)")
+                          .attr("font-size","14px");
+
+
+//
+
+
+
+
+
+})
+})//cloropleth
+  })//json
+});//time to travel bar
+
+
+
+    </script>
+  </body>
+</html>

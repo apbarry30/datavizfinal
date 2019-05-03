@@ -84,14 +84,18 @@ h5{
   display: none;
 }
 
+.leg_text text{
+  color:white;
+}
+
 .map {
     width: 100%;
     max-width: 1024px;
     margin: 0 auto;
   }
-
+#two{
+  margin-left: 20px;
+}
   #intro{
     margin-top: 100px;
-
-
   }
